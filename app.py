@@ -17,7 +17,7 @@ import dash_cytoscape as cyto
 import os
 import json
 import sys
-import webbrowser
+
 #print(os.__version__)
 
 adir = os.getcwd()
@@ -4746,5 +4746,5 @@ def displayTapNodeData(data):
 """
 
 if __name__ == '__main__':
-    webbrowser.open_new(url='http://127.0.0.1:8050')
+    
     app.run(debug=False)
