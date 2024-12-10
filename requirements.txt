@@ -4,4 +4,4 @@ gunicorn
 pandas
 dash-tools
 dash_cytoscape
-webbrowser
+
