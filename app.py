@@ -24,7 +24,7 @@ personnes=[]
 afile =adir+"\\js.txt"
 #afile = 'E:\develop\Python\Diagramas\Genealogie\genjean.txt'
 aNodes=[]
-with open(afile, "r",encoding='utf-8') as meu_json:
+with open(afile, "r") as meu_json:
     personnes = json.load(meu_json)
 
 app = Dash(__name__)
