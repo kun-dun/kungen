@@ -5,5 +5,5 @@ pandas
 dash-tools
 dash_cytoscape
 dearpygui
-PIL
+
 
