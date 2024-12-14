@@ -202,7 +202,7 @@ def _from_rgb(rgb):
     """
     return "#%02x%02x%02x" % rgb
 
-aphoto='asset\homme.jpg'
+aphoto='asset\\homme.jpg'
 
 # Using base64 encoding and decoding
 def bimage(image_filename):
