@@ -5,6 +5,6 @@ pandas
 dash-tools
 dash_cytoscape
 dearpygui
-base64
+
 
 
