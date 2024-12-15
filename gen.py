@@ -202,7 +202,7 @@ def _from_rgb(rgb):
     """
     return "#%02x%02x%02x" % rgb
 
-aphoto='asset\\homme.jpg'
+aphoto='asset/homme.jpg'
 
 # Using base64 encoding and decoding
 def bimage(image_filename):
@@ -291,9 +291,9 @@ def update_image(data):
     aphoto ='annick.jpg'
 
     #if os.path.exists('asset\\'+str(data['personneid'])+'.jpg'):
-  #      aphoto='asset\\'+str(data['personneid'])+'.jpg'
-   # else:
-       # aphoto='asset\\homme.jpg'
+       aphoto='asset/'+str(data['personneid'])+'.jpg'
+    else:
+       aphoto='asset\\homme.jpg'
 
    #        #files=get_files_info(DIRECTORY_PATH)
 #    return Image.open(aphoto)
