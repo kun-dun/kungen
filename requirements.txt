@@ -1,10 +1,13 @@
 dash==2.18.2
 dash_cytoscape==1.0.2
 gunicorn
-pandas
+base64
 dash-tools
-dash_cytoscape
-dearpygui
+os
+json
+sys
+webbrowser
+showinfm
 
 
 
