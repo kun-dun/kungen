@@ -3,7 +3,6 @@ dash_cytoscape==1.0.2
 gunicorn
 Pillow
 dash-tools
-sys
 webbrowser
 showinfm
 
