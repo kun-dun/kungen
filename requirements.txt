@@ -1,9 +1,8 @@
 dash==2.18.2
 dash_cytoscape==1.0.2
 gunicorn
-pillow
+Pillow
 dash-tools
-os
 json
 sys
 webbrowser
