@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+##-------------------------------------------------------------------------------
 # Name:        GEN
 # Purpose:     ARVORE GENEALOGICA COM DASH - FUNCIONANDO
 #              Usadso dashboard.render4.com para expor na WB
@@ -13804,5 +13804,5 @@ def display_tap_node_data(data):
 
 
 if __name__ == '__main__':
-    webbrowser.open_new(url='http://127.0.0.1:8050')
+    #webbrowser.open_new(url='http://127.0.0.1:8050')
     gen.run(debug=False)
