@@ -22,6 +22,7 @@ import json
 import webbrowser
 import base64
 import platform
+import ctypes
 
 adir = os.getcwd()
 afile = adir + '\\js.txt'
@@ -13677,6 +13678,7 @@ def update_dropdown(data):
         return [], None
 
     person_dir = os.path.join(adir, str(data['personneid']))
+    ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
     if not os.path.exists(person_dir):
         return [], None
 
