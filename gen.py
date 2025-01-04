@@ -13621,7 +13621,7 @@ gen.layout = dbc.Container([
 
 
     dbc.Row([
-        dbc.Col([ html.Label('Rechercher un Nom', id='lab-rech', n_clicks=0)],width=1),
+        dbc.Col([ html.Label('Recherchez un Nom', id='lab-rech', n_clicks=0)],width=1),
         dbc.Col([ html.Div(dcc.Input(id='input-on-rech', type='text'))]),
 
     dbc.Row([
