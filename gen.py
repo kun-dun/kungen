@@ -13679,7 +13679,6 @@ def update_dropdown(data):
 
     person_dir = str(data['personneid'])+'/' #os.path.join(adir, str(data['personneid']))
     persone_dir=f"person_dir"
-    persone_dir=f"person_dir"
     ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
     if not os.path.exists(person_dir):
         return [], None
@@ -13782,4 +13781,5 @@ def display_tap_node_data(data):
 
 if __name__ == '__main__':
     #webbrowser.open_new(url='http://127.0.0.1:8050')
+    ctypes.windll.user32.MessageBoxW(0, "Continuer ?", "Your title", 1)
     gen.run(debug=False)
