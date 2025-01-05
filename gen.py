@@ -13621,7 +13621,7 @@ gen.layout = dbc.Container([
 
 
     dbc.Row([
-        dbc.Col([ html.Label('Recherchez un Nom', id='lab-rech', n_clicks=0)],width=1),
+        dbc.Col([ html.Label('Rechercher un Nom', id='lab-rech', n_clicks=0)],width=1),
         dbc.Col([ html.Div(dcc.Input(id='input-on-rech', type='text'))]),
 
     dbc.Row([
@@ -13677,8 +13677,13 @@ def update_dropdown(data):
     if data is None:
         return [], None
 
-    person_dir = "asset/"+str(data['personneid'])+'/' #os.path.join(adir, str(data['personneid']))
-    ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
+    person_dir = "asset/"+str(data['personneid'])+'/'
+
+   # person_dir =    #   os.path.join(adir, str(data['personneid']))
+    os.path.join(adir, person_dir)
+    #person_dir=f"person_dir"
+
+    #ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
     if not os.path.exists(person_dir):
         return [], None
 
@@ -13697,10 +13702,10 @@ def update_dropdown(data):
 def execute_file(n_clicks, file_path):
     if not file_path:
         return ''
-
+    print(file_path)
     system = platform.system()
     if system == "Windows":
-        os.startfile(adir+'/'+(file_path)
+        os.startfile(adir+'/'+file_path)
     elif system == "Darwin":
         subprocess.run(['open', file_path])
     else:
@@ -13724,9 +13729,26 @@ def update_image(data):
         return bimage('photos/homme.jpg')
 
     photo_path = f"photos/{data['personneid']}.jpg"
+    #print(photo_path)
     if os.path.exists(photo_path):
         return bimage(photo_path)
     return bimage('photos/homme.jpg')
+
+#######################################
+@gen.callback(
+    Output('cytoscape-event-callbacks-1', 'viewport'),
+    Input('cytoscape-event-callbacks-1', 'tapNodeData')
+)
+def center_on_node(node_data):
+    if not node_data:
+        return None
+
+    # Center the view on the tapped node with some zoom
+    return {
+        'zoom': 2,
+        'pan': {'x': 0, 'y': 0},
+        'target': f'#{node_data["id"]}'
+    }
 
 
 ######################## CALLBACK INFO PESSOA
@@ -13737,6 +13759,7 @@ def update_image(data):
 def display_tap_node_data(data):
     if data is None:
         return ''
+
 
     details = [
         f"{data['nom']},{data['prenoms']}",
@@ -13779,6 +13802,6 @@ def display_tap_node_data(data):
     )
 
 if __name__ == '__main__':
-    #webbrowser.open_new(url='http://127.0.0.1:8050')
-    ctypes.windll.user32.MessageBoxW(0, "Continuer ?", "Your title", 1)
+    #ctypes.windll.user32.MessageBoxW(0,"Continuer ?", "Your title", 1)
+    webbrowser.open_new(url='http://127.0.0.1:8050')
     gen.run(debug=False)
