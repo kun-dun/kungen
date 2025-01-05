@@ -13677,7 +13677,7 @@ def update_dropdown(data):
     if data is None:
         return [], None
 
-    person_dir = "asset\\"+str(data['personneid'])+'\\'
+    person_dir = "asset/"+str(data['personneid'])+'/'
 
    # person_dir =    #   os.path.join(adir, str(data['personneid']))
     os.path.join(adir, person_dir)
@@ -13686,12 +13686,9 @@ def update_dropdown(data):
     #ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
     if not os.path.exists(person_dir):
         return [], None
-    system = platform.system()
-    if system == "Windows":
-        files = os.listdir(adir+'\\'+person_dir)
-
+    files = os.listdir(adir+'/'+person_dir)
     options = [{'label': f, 'value': os.path.join(person_dir, f)} for f in files]
-    print(files)
+    #print(files)
     return options, None
 
 
@@ -13710,7 +13707,7 @@ def execute_file(n_clicks, file_path):
 
     system = platform.system()
     if system == "Windows":
-        os.startfile(adir+'\\'+file_path)
+        os.startfile(adir+'/'+file_path)
     elif system == "Darwin":
         subprocess.run(['open', file_path])
     else:
