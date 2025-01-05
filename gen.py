@@ -13678,7 +13678,6 @@ def update_dropdown(data):
         return [], None
 
     person_dir = "asset/"+str(data['personneid'])+'/' #os.path.join(adir, str(data['personneid']))
-    persone_dir=f"person_dir"
     ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
     if not os.path.exists(person_dir):
         return [], None
@@ -13701,7 +13700,7 @@ def execute_file(n_clicks, file_path):
 
     system = platform.system()
     if system == "Windows":
-        os.startfile(file_path)
+        os.startfile(adir+'/'+(file_path)
     elif system == "Darwin":
         subprocess.run(['open', file_path])
     else:
