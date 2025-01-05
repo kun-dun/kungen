@@ -13677,7 +13677,7 @@ def update_dropdown(data):
     if data is None:
         return [], None
 
-    person_dir = str(data['personneid'])+'/' #os.path.join(adir, str(data['personneid']))
+    person_dir = "asset/"+str(data['personneid'])+'/' #os.path.join(adir, str(data['personneid']))
     persone_dir=f"person_dir"
     ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
     if not os.path.exists(person_dir):
