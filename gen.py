@@ -13707,14 +13707,8 @@ def execute_file(n_clicks, file_path):
         return ''
 
     system = platform.system()
-    file_path = adir+'/'+file_path
-    if system == "Windows":
-        os.startfile(file_path)
-    elif system == "Darwin":
-        subprocess.run(['open', file_path])
-    else:
-        subprocess.run(['xdg-open', file_path])
-    #print(file_path)
+    webbrowser.open(adir+'/'+file_path)
+
     return ''
 
 
