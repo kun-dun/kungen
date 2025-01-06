@@ -23,6 +23,7 @@ import webbrowser
 import base64
 import platform
 import ctypes
+import requests
 
 adir = os.getcwd()
 afile = adir + '\\js.txt'
@@ -13699,11 +13700,11 @@ def update_dropdown(data):
     State('my-dpdn', 'value'),
     prevent_initial_call=True
 )
+
 def execute_file(n_clicks, file_path):
     #print(file_path)
     if not file_path:
-       ctypes.windll.user32.MessageBoxW(0,adir+'/'+file_path, "Erro", 1)
-       return ''
+        return ''
 
     system = platform.system()
     if system == "Windows":
@@ -13713,6 +13714,8 @@ def execute_file(n_clicks, file_path):
     else:
         subprocess.run(['xdg-open', file_path])
     return ''
+
+
 
 #######################  CALLBACK PHOTO
 @callback(
