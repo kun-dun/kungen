@@ -13680,14 +13680,12 @@ def update_dropdown(data):
 
     person_dir = "asset/"+str(data['personneid'])+'/'
 
-   # person_dir =    #   os.path.join(adir, str(data['personneid']))
     os.path.join(adir, person_dir)
-    #person_dir=f"person_dir"
 
-    #ctypes.windll.user32.MessageBoxW(0, person_dir, "Your title", 1)
     if not os.path.exists(person_dir):
-        return [], None
+       return [], None
     files = os.listdir(adir+'/'+person_dir)
+
     options = [{'label': f, 'value': os.path.join(person_dir, f)} for f in files]
     #print(files)
     return options, None
@@ -13703,12 +13701,14 @@ def update_dropdown(data):
 
 def execute_file(n_clicks, file_path):
 
-    if not file_path:
-        return ''
+    end = 'https://github.com/kun-dun/kungen/blob/main/'
+    aurl=end+file_path
+  #  if not file_path:
+   #     return ''
 
-    system = platform.system()
-    webbrowser.open(adir+'/'+file_path)
-
+    #system = platform.system()
+    #webbrowser.open(adir+'/'+file_path)
+    webbrowser.open(aurl)
     return ''
 
 
