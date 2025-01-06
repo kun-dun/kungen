@@ -13766,7 +13766,7 @@ def execute_file(n_clicks, file_path):
 
     os.startfile(locfile)
     
-    #webbrowser.open(locfile)
+    webbrowser.open(locfile)
 
     return locfile
 
