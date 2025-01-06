@@ -5,7 +5,7 @@
 #              Vide video YOUTUBE : https://www.youtube.com/watch?v=H16dZMYmvqo
 #
 # Author:      ylalo
-# Version      1.2
+# Version      1.3
 #
 # Created:     27-11-2024
 # Copyright:   (c) ylalo 2024
@@ -24,6 +24,7 @@ import base64
 import platform
 import ctypes
 import requests
+from urllib.parse import urlparse
 
 adir = os.getcwd()
 afile = adir + '\\js.txt'
@@ -13573,6 +13574,50 @@ my_stylesheet = [
     }
 ]
 
+def download_github_file(github_url, save_path=None):
+    """
+    Download a file from GitHub and save it locally.
+
+    Args:
+        github_url (str): Raw GitHub URL of the file
+        save_path (str): Local path to save the file. If None, saves in current directory
+    """
+    try:
+        # Convert regular GitHub URL to raw URL if needed
+        if 'raw.githubusercontent.com' not in github_url:
+            github_url = github_url.replace('github.com', 'raw.githubusercontent.com')
+            github_url = github_url.replace('/blob/', '/')
+
+        # Download the file
+        response = requests.get(github_url, stream=True)
+        response.raise_for_status()
+
+        # Get filename from URL if save_path not provided
+        if not save_path:
+            filename = os.path.basename(urlparse(github_url).path)
+            save_path = localdir+filename
+
+        # Save the file
+        with open(save_path, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    file.write(chunk)
+
+        #return f"File successfully downloaded to {save_path}"
+        return save_path
+
+    except requests.exceptions.RequestException as e:
+        return f"Error downloading file: {e}"
+    except IOError as e:
+        return f"Error saving file: {e}"
+
+# Example usage:
+
+localdir = "C:/Users/Public/Downloads/"
+
+
+# Example usage:
+
 def _from_rgb(rgb):
     return "#%02x%02x%02x" % rgb
 
@@ -13604,26 +13649,33 @@ gen.layout = dbc.Container([
     ]),
     dbc.Row(
         dbc.Col(html.H1("Cliquer sur la Personne pour voir les Détails",
-                        className='text-center fs-6'),
-                width=12)
+                        className='text-center fs-6'),width=12)
+
+
     ),
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
 
-     dbc.Row([
-        dbc.Col(html.Button('Ouvrir', id='submit-func', n_clicks=0),md=1),
-        dbc.Col([dcc.Dropdown(id='my-dpdn', multi=False, placeholder='Choisir un Document',
-                         className='text-center text-primary'),
-        html.Div(id='dd-output-container'),
-        dcc.Store(id='current-node-data')],md=4)]),
-
-
-
     dbc.Row([
-        dbc.Col([ html.Label('Rechercher un Nom', id='lab-rech', n_clicks=0)],width=1),
-        dbc.Col([ html.Div(dcc.Input(id='input-on-rech', type='text'))]),
+
+        dbc.Col(dcc.Dropdown(id='my-dpdn', multi=False, placeholder='Choisir un Document',
+                         className='text-center text-primary'),md=4),
+        dbc.Col(html.Button('Ouvrir', id='submit-func', n_clicks=0),md=1),
+        html.Div(id='dd-output-container'),
+        dcc.Store(id='current-node-data')
+        ]),
+
+    dbc.Row([html.H1()]),
+    dbc.Row([html.H1()]),
+    dbc.Row([html.H1()]),
+    dbc.Row([html.H1()]),
+    dbc.Row([
+        #dbc.Col([ html.Label('Rechercher un Nom', id='lab-rech', n_clicks=0)]),
+        dbc.Col([ html.Div(dcc.Input(id='input-on-rech', type='text', placeholder='Rechercher um Nom',className='text-center '))
+        ]),
+
 
     dbc.Row([
         dbc.Col([cyto.Cytoscape(
@@ -13703,12 +13755,16 @@ def execute_file(n_clicks, file_path):
 
     end = 'https://github.com/kun-dun/kungen/blob/main/'
     aurl=end+file_path
+    #savepath = "C:/Users/Public/Downloads/"
+    #basename = os.path.basename(savepath)
+    locfile=download_github_file(aurl, "")
+
   #  if not file_path:
    #     return ''
 
     #system = platform.system()
-    #webbrowser.open(adir+'/'+file_path)
-    webbrowser.open(aurl)
+    webbrowser.open(locfile)
+
     return ''
 
 
