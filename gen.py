@@ -13663,7 +13663,7 @@ gen.layout = dbc.Container([
         dbc.Col(dcc.Dropdown(id='my-dpdn', multi=False, placeholder='Choisir un Document',
                          className='text-center text-primary'),md=4),
         dbc.Col(html.Button('Ouvrir', id='submit-func', n_clicks=0),md=1),
-        html.Div(id='dd-output-container'),
+        html.Div(id='dd-output-container',className='fs-8'),
         dcc.Store(id='current-node-data')
         ]),
 
@@ -13745,7 +13745,8 @@ def update_dropdown(data):
 
 ###################  CALLBACK ABRE ARQUIVO DROPDOWN
 @callback(
-    Output('container-button-func', 'children'),
+   #Output('container-button-func', 'children'),
+    Output('dd-output-container', 'children'),
     Input('submit-func', 'n_clicks'),
     State('my-dpdn', 'value'),
     prevent_initial_call=True
@@ -13758,14 +13759,20 @@ def execute_file(n_clicks, file_path):
     #savepath = "C:/Users/Public/Downloads/"
     #basename = os.path.basename(savepath)
     locfile=download_github_file(aurl, "")
-    print(locfile)
+
   #  if not file_path:
    #     return ''
 
-    #system = platform.system()
-    webbrowser.open(locfile)
+    system = platform.system()
+    if system == "Windows":
+        os.startfile(locfile)
+    elif system == "Darwin":
+        subprocess.run(['open', file_path])
+    else:
+        subprocess.run(['xdg-open', file_path])
+    #webbrowser.open(locfile)
 
-    return ''
+    return locfile
 
 
 
