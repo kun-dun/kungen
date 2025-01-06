@@ -13702,17 +13702,19 @@ def update_dropdown(data):
 )
 
 def execute_file(n_clicks, file_path):
-    #print(file_path)
+
     if not file_path:
         return ''
 
     system = platform.system()
+    file_path = adir+'/'+file_path
     if system == "Windows":
-        os.startfile(adir+'/'+file_path)
+        os.startfile(file_path)
     elif system == "Darwin":
         subprocess.run(['open', file_path])
     else:
         subprocess.run(['xdg-open', file_path])
+    #print(file_path)
     return ''
 
 
