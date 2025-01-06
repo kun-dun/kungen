@@ -13584,6 +13584,7 @@ def download_github_file(github_url, save_path=None):
     """
     try:
         # Convert regular GitHub URL to raw URL if needed
+        localdir = "C:/Users/Public/Downloads/"
         if 'raw.githubusercontent.com' not in github_url:
             github_url = github_url.replace('github.com', 'raw.githubusercontent.com')
             github_url = github_url.replace('/blob/', '/')
@@ -13613,7 +13614,7 @@ def download_github_file(github_url, save_path=None):
 
 # Example usage:
 
-localdir = "C:/Users/Public/Downloads/"
+
 
 
 # Example usage:
