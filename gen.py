@@ -12,8 +12,9 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import subprocess
+import dash
 import dash_core_components as dcc
-from dash import Dash, html, Input, Output, callback, dash_table
+from dash import Dash, html, Input, Output, callback, dash_table,dcc
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
@@ -25,6 +26,38 @@ import platform
 import ctypes
 import requests
 from urllib.parse import urlparse
+import logging
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+
+#import plotly.graph_objs as go
+
+from collections import deque
+
+
+####################################################
+# Configuração do logging
+def setup_logger():
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+
+    logger = logging.getLogger('app_logger')
+    logger.setLevel(logging.INFO)
+
+    # Handler para arquivo
+    file_handler = logging.FileHandler('logs/app.log')
+    file_handler.setLevel(logging.INFO)
+
+    # Formato do log
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    return logger
+
+#####################################################
 
 adir = os.getcwd()
 afile = adir + '\\js.txt'
@@ -13519,6 +13552,13 @@ gen = Dash(__name__,external_stylesheets=[dbc.themes.BOOTSTRAP],
                             'content': 'width=device-width, initial-scale=1.0'}])
 server = gen.server
 
+######################### LOG
+# Initialize logger
+logger = setup_logger()
+
+
+###################################
+
 styles = {
     'pre': {
         'border': 'thin lightgrey solid',
@@ -13583,8 +13623,8 @@ def download_github_file(github_url, save_path=None):
         save_path (str): Local path to save the file. If None, saves in current directory
     """
     try:
-        # Convert regular GitHub URL to raw URL if needed
         localdir = "C:\\Users\\Public\\Downloads\\"
+        # Convert regular GitHub URL to raw URL if needed
         if 'raw.githubusercontent.com' not in github_url:
             github_url = github_url.replace('github.com', 'raw.githubusercontent.com')
             github_url = github_url.replace('/blob/', '/')
@@ -13764,9 +13804,14 @@ def execute_file(n_clicks, file_path):
   #  if not file_path:
    #     return ''
 
-    os.startfile(locfile)
-    
-    webbrowser.open(locfile)
+    system = platform.system()
+    if system == "Windows":
+        os.startfile(locfile)
+    elif system == "Darwin":
+        subprocess.run(['open', file_path])
+    else:
+        subprocess.run(['xdg-open', file_path])
+    #webbrowser.open(locfile)
 
     return locfile
 
@@ -13863,5 +13908,6 @@ def display_tap_node_data(data):
 
 if __name__ == '__main__':
     #ctypes.windll.user32.MessageBoxW(0,"Continuer ?", "Your title", 1)
+
     webbrowser.open_new(url='http://127.0.0.1:8050')
     gen.run(debug=False)
