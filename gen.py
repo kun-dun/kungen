@@ -23,18 +23,17 @@ import json
 import webbrowser
 import base64
 import platform
-import ctypes
-import requests
-from urllib.parse import urlparse
+#import ctypes
+#import requests
+#from urllib.parse import urlparse
 import logging
 from datetime import datetime
-from logging.handlers import RotatingFileHandler
-from pathlib import Path
+#from logging.handlers import RotatingFileHandler
+#from pathlib import Path
 
 
-#import plotly.graph_objs as go
 
-from collections import deque
+#from collections import deque
 
 
 ####################################################
