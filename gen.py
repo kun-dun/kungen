@@ -24,7 +24,7 @@ import webbrowser
 import base64
 import platform
 #import ctypes
-#import requests
+import requests
 #from urllib.parse import urlparse
 import logging
 from datetime import datetime
@@ -13613,38 +13613,38 @@ my_stylesheet = [
     }
 ]
 
-def download_github_file(github_url, save_path=None):
-    """
-    Download a file from GitHub and save it locally.
-
-    Args:
-        github_url (str): Raw GitHub URL of the file
-        save_path (str): Local path to save the file. If None, saves in current directory
-    """
+def downloadgithubfile(github_raw_url):
+   
     try:
-        localdir = "C:\\Users\\Public\\Downloads\\"
-        # Convert regular GitHub URL to raw URL if needed
-        if 'raw.githubusercontent.com' not in github_url:
-            github_url = github_url.replace('github.com', 'raw.githubusercontent.com')
-            github_url = github_url.replace('/blob/', '/')
+        # Download the file content
+        response = requests.get(github_raw_url)
+        response.raise_for_status()  # Raise exception for bad status codes
 
-        # Download the file
-        response = requests.get(github_url, stream=True)
-        response.raise_for_status()
+        # Get filename from URL
+        filename = 'C:\\Users\\Public\\Downloads\\'+github_raw_url.split('/')[-1]
 
-        # Get filename from URL if save_path not provided
-        if not save_path:
-            filename = os.path.basename(urlparse(github_url).path)
-            save_path = localdir+filename
+        # Save the content to a temporary file
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(response.text)
+        return filename
+        #print(f"Arquivo {filename} baixado com sucesso!")
 
-        # Save the file
-        with open(save_path, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    file.write(chunk)
+        # Method 1: Execute as a module
+        #spec = importlib.util.spec_from_file_location("github_module", filename)
+        #module = importlib.util.module_from_spec(spec)
+        #spec.loader.exec_module(module)
 
-        #return f"File successfully downloaded to {save_path}"
-        return save_path
+        # Method 2: Execute using exec() (alternative method)
+        # with open(filename, 'r', encoding='utf-8') as f:
+        #     exec(f.read())
+
+        # Clean up - remove temporary file
+        #os.remove(filename)
+
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao baixar o arquivo: {e}")
+    except Exception as e:
+        print(f"Erro ao executar o arquivo: {e}")
 
     except requests.exceptions.RequestException as e:
         return f"Error downloading file: {e}"
@@ -13794,11 +13794,11 @@ def update_dropdown(data):
 
 def execute_file(n_clicks, file_path):
 
-    end = 'https://github.com/kun-dun/kungen/blob/main/'
+    end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/asset/'
     aurl=end+file_path
     #savepath = "C:/Users/Public/Downloads/"
     #basename = os.path.basename(savepath)
-    locfile=download_github_file(aurl, "")
+    locfile=downloadgithubfile(aurl)
     print(locfile)
   #  if not file_path:
    #     return ''
