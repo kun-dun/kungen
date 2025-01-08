@@ -26,8 +26,8 @@ import platform
 #import ctypes
 import requests
 #from urllib.parse import urlparse
-import logging
-from datetime import datetime
+#import logging
+#from datetime import datetime
 #from logging.handlers import RotatingFileHandler
 #from pathlib import Path
 
@@ -38,6 +38,7 @@ from datetime import datetime
 
 ####################################################
 # Configuração do logging
+"""
 def setup_logger():
     if not os.path.exists('logs'):
         os.makedirs('logs')
@@ -55,7 +56,7 @@ def setup_logger():
 
     logger.addHandler(file_handler)
     return logger
-
+"""
 #####################################################
 
 adir = os.getcwd()
@@ -13553,7 +13554,7 @@ server = gen.server
 
 ######################### LOG
 # Initialize logger
-logger = setup_logger()
+#logger = setup_logger()
 
 
 ###################################
@@ -13612,9 +13613,8 @@ my_stylesheet = [
         }
     }
 ]
+def downloadandgithub_file(github_raw_url):
 
-def downloadgithubfile(github_raw_url):
-   
     try:
         # Download the file content
         response = requests.get(github_raw_url)
@@ -13626,37 +13626,15 @@ def downloadgithubfile(github_raw_url):
         # Save the content to a temporary file
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(response.text)
+
         return filename
-        #print(f"Arquivo {filename} baixado com sucesso!")
 
-        # Method 1: Execute as a module
-        #spec = importlib.util.spec_from_file_location("github_module", filename)
-        #module = importlib.util.module_from_spec(spec)
-        #spec.loader.exec_module(module)
 
-        # Method 2: Execute using exec() (alternative method)
-        # with open(filename, 'r', encoding='utf-8') as f:
-        #     exec(f.read())
-
-        # Clean up - remove temporary file
-        #os.remove(filename)
 
     except requests.exceptions.RequestException as e:
         print(f"Erro ao baixar o arquivo: {e}")
     except Exception as e:
         print(f"Erro ao executar o arquivo: {e}")
-
-    except requests.exceptions.RequestException as e:
-        return f"Error downloading file: {e}"
-    except IOError as e:
-        return f"Error saving file: {e}"
-
-# Example usage:
-
-
-
-
-# Example usage:
 
 def _from_rgb(rgb):
     return "#%02x%02x%02x" % rgb
@@ -13794,18 +13772,18 @@ def update_dropdown(data):
 
 def execute_file(n_clicks, file_path):
 
-    end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/asset/'
+    end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/'
     aurl=end+file_path
     #savepath = "C:/Users/Public/Downloads/"
-    #basename = os.path.basename(savepath)
-    locfile=downloadgithubfile(aurl)
-    print(locfile)
+    basename = os.path.basename(file_path)
+    locfile=downloadandgithub_file(aurl)
+    #print(locfile)
   #  if not file_path:
    #     return ''
 
     system = platform.system()
     if system == "Windows":
-        os.startfile(locfile)
+        os.startfile(adir+'/'+file_path)
     elif system == "Darwin":
         subprocess.run(['open', file_path])
     else:
