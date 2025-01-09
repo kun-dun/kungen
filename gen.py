@@ -13,18 +13,28 @@
 #-------------------------------------------------------------------------------
 import subprocess
 import dash
-import dash_core_components as dcc
+#import dash_core_components as dcc
 from dash import Dash, html, Input, Output, callback, dash_table,dcc
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import os
+
 import json
 import webbrowser
 import base64
 import platform
 #import ctypes
 import requests
+from PIL import Image
+import pandas as pd
+import io
+import plotly.express as px
+import fitz  # PyMuPDF for PDF handling
+#from docx import Document  # python-docx for DOC/DOCX files
+import tempfile
+
+import builtins
 #from urllib.parse import urlparse
 #import logging
 #from datetime import datetime
@@ -34,6 +44,95 @@ import requests
 
 
 #from collections import deque
+#################### TRATAMENTO LEITURA ARQUIVOS DA WEB
+def process_image(content):
+    """Process and display image content"""
+    try:
+        # Create a temporary file to save the image
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        # Open and resize image if necessary
+        img = Image.open(tmp_path)
+        max_size = (800, 800)
+        img.thumbnail(max_size, Image.Resampling.LANCZOS)
+
+        # Save processed image
+        img_buffer = io.BytesIO()
+        img.save(img_buffer, format='PNG')
+        img_str = base64.b64encode(img_buffer.getvalue()).decode()
+
+        # Clean up
+        os.unlink(tmp_path)
+
+        return html.Div([
+            html.H3("Image Preview"),
+            html.Img(src=f'data:image/png;base64,{img_str}')
+        ])
+    except Exception as e:
+        return html.Div(f"Error processing image: {str(e)}")
+
+def process_pdf(content):
+    """Process and display PDF content"""
+    try:
+        # Create a temporary file to save the PDF
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        # Open PDF and convert first few pages to images
+        pdf_document = fitz.open(tmp_path)
+        pages_content = []
+
+        for page_num in range(min(3, len(pdf_document))):  # Show first 3 pages
+            page = pdf_document[page_num]
+            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))  # Increase resolution
+            img_data = base64.b64encode(pix.tobytes()).decode()
+
+            pages_content.append(html.Div([
+                html.H4(f"Page {page_num + 1}"),
+                html.Img(src=f'data:image/png;base64,{img_data}')
+            ]))
+
+        # Clean up
+        pdf_document.close()
+        os.unlink(tmp_path)
+
+        return html.Div([
+            html.H3("PDF Preview"),
+            html.Div(pages_content)
+        ])
+    except Exception as e:
+        return html.Div(f"Error processing PDF: {str(e)}")
+
+def process_doc(content):
+    """Process and display DOC/DOCX content"""
+    try:
+        # Create a temporary file to save the document
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.docx') as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        # Read document
+        doc = Document(tmp_path)
+
+        # Extract and format content
+        paragraphs = []
+        for para in doc.paragraphs:
+            paragraphs.append(html.P(para.text))
+
+        # Clean up
+        os.unlink(tmp_path)
+
+        return html.Div([
+            html.H3("Document Preview"),
+            html.Div(paragraphs)
+        ])
+    except Exception as e:
+        return html.Div(f"Error processing document: {str(e)}")
+
+
 
 
 ####################################################
@@ -13613,29 +13712,6 @@ my_stylesheet = [
         }
     }
 ]
-def downloadandgithub_file(github_raw_url):
-
-    try:
-        # Download the file content
-        response = requests.get(github_raw_url)
-        response.raise_for_status()  # Raise exception for bad status codes
-
-        # Get filename from URL
-        filename = 'C:\\Users\\Public\\Downloads\\'+github_raw_url.split('/')[-1]
-
-        # Save the content to a temporary file
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(response.text)
-
-        return filename
-
-
-
-    except requests.exceptions.RequestException as e:
-        print(f"Erro ao baixar o arquivo: {e}")
-    except Exception as e:
-        print(f"Erro ao executar o arquivo: {e}")
-
 def _from_rgb(rgb):
     return "#%02x%02x%02x" % rgb
 
@@ -13668,8 +13744,6 @@ gen.layout = dbc.Container([
     dbc.Row(
         dbc.Col(html.H1("Cliquer sur la Personne pour voir les Détails",
                         className='text-center fs-6'),width=12)
-
-
     ),
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
@@ -13680,8 +13754,15 @@ gen.layout = dbc.Container([
 
         dbc.Col(dcc.Dropdown(id='my-dpdn', multi=False, placeholder='Choisir un Document',
                          className='text-center text-primary'),md=4),
-        dbc.Col(html.Button('Ouvrir', id='submit-func', n_clicks=0),md=1),
-        html.Div(id='dd-output-container',className='fs-8'),
+        html.Div(id='output-container'),
+
+        #dbc.Col(html.Button('Ouvrir', id='submit-func', n_clicks=0),md=1),
+        #html.Div(id='dd-output-container',className='fs-8'),
+         # Content display
+        html.Div(id='file-content'),
+        # Data visualization (for CSV files)
+        #dcc.Graph(id='data-visualization'),
+
         dcc.Store(id='current-node-data')
         ]),
 
@@ -13718,6 +13799,7 @@ gen.layout = dbc.Container([
 ],fluid= True)
 
 
+
 ############# CALLBACK SEARCH
 
 @callback(
@@ -13737,60 +13819,6 @@ def update_search(search_text, stylesheet):
         }
     })
     return stylesheet
-
-######################## CALLBACK DROPDOWN
-@callback(
-    Output('my-dpdn', 'options'),
-    Output('my-dpdn', 'value'),
-    Input('current-node-data', 'data')
-)
-def update_dropdown(data):
-    if data is None:
-        return [], None
-
-    person_dir = "asset/"+str(data['personneid'])+'/'
-
-    os.path.join(adir, person_dir)
-
-    if not os.path.exists(person_dir):
-       return [], None
-    files = os.listdir(adir+'/'+person_dir)
-
-    options = [{'label': f, 'value': os.path.join(person_dir, f)} for f in files]
-    #print(files)
-    return options, None
-
-
-###################  CALLBACK ABRE ARQUIVO DROPDOWN
-@callback(
-   #Output('container-button-func', 'children'),
-    Output('dd-output-container', 'children'),
-    Input('submit-func', 'n_clicks'),
-    State('my-dpdn', 'value'),
-    prevent_initial_call=True
-)
-
-def execute_file(n_clicks, file_path):
-
-    end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/'
-    aurl=end+file_path
-    #savepath = "C:/Users/Public/Downloads/"
-    basename = os.path.basename(file_path)
-    locfile=downloadandgithub_file(aurl)
-    #print(locfile)
-  #  if not file_path:
-   #     return ''
-
-    system = platform.system()
-    if system == "Windows":
-        os.startfile(adir+'/'+file_path)
-    elif system == "Darwin":
-        subprocess.run(['open', file_path])
-    else:
-        subprocess.run(['xdg-open', file_path])
-    #webbrowser.open(locfile)
-
-    return locfile
 
 
 
@@ -13880,8 +13908,98 @@ def display_tap_node_data(data):
             "font-size": "6",
             'line-height': '1',
             "text-max-width": 40
-        }
-    )
+        })
+
+
+def showfile(url):    #############Mostra arquivo do github do node cliquado
+    try:
+        # Fetch content from GitHub
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        # Determine file type from URL
+        file_extension = url.split('.')[-1].lower()
+
+        # Process different file types
+        if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
+            return process_image(response.content), '', {}
+
+        elif file_extension == 'pdf':
+            return process_pdf(response.content), '', {}
+
+        elif file_extension in ['doc', 'docx']:
+            return process_doc(response.content), '', {}
+
+        elif file_extension == 'csv':
+            # Parse CSV data
+            content = response.text
+            df = pd.read_csv(io.StringIO(content))
+
+            # Create table display
+            table = html.Div([
+                html.H3("Data Preview"),
+                html.Table([
+                    html.Thead(html.Tr([html.Th(col) for col in df.columns])),
+                    html.Tbody([
+                        html.Tr([html.Td(df.iloc[i][col]) for col in df.columns])
+                        for i in range(min(5, len(df)))
+                    ])
+                ])
+            ])
+
+            # Create visualization if numerical columns exist
+            numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+            if len(numeric_cols) >= 2:
+                fig = px.scatter(df, x=numeric_cols[0], y=numeric_cols[1],
+                               title=f"Scatter Plot: {numeric_cols[0]} vs {numeric_cols[1]}")
+            else:
+                fig = {}
+
+            return table, '', fig
+
+        elif file_extension in ['txt', 'md', 'py', 'json']:
+            return html.Pre(response.text), '', {}
+
+        else:
+            return html.Div("Format de Fichier non reconnu!"), '', {}
+
+    except Exception as e:
+        return '', f"Error: {str(e)}", {}
+
+######################## CALLBACK DROPDOWN
+@callback(
+    Output('my-dpdn', 'options'),
+    Output('my-dpdn', 'value'),
+    Input('current-node-data', 'data')
+)
+def update_dropdown(data):
+    if data is None:
+        return [], None
+
+    person_dir = "asset/"+str(data['personneid'])+'/'
+
+    os.path.join(adir, person_dir)
+
+    if not os.path.exists(person_dir):
+       return [], None
+    files = os.listdir(adir+'/'+person_dir)
+
+    options = [{'label': f, 'value': os.path.join(person_dir, f)} for f in files]
+
+    #print(files)
+    return options, None
+
+@gen.callback(
+    Output('output-container', 'children'),
+    Input('my-dpdn', 'value')
+)
+def update_output(value):
+    if not value == None:
+        end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/'
+        aurl=end+str(value)
+        return showfile(aurl)
+
+
 
 if __name__ == '__main__':
     #ctypes.windll.user32.MessageBoxW(0,"Continuer ?", "Your title", 1)
