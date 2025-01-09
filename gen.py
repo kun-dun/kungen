@@ -27,7 +27,7 @@ import platform
 #import ctypes
 import requests
 from PIL import Image
-import pandas as pd
+#import pandas as pd
 import io
 import plotly.express as px
 import fitz  # PyMuPDF for PDF handling
