@@ -6,7 +6,7 @@ show_in_file_manager==1.1.5
 requests==2.32.3
 plotly
 fitz==0.0.1.dev2
-
+PyMuPDF
 python-docx==1.1.2
 
 
