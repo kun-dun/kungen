@@ -5,7 +5,7 @@
 #              Vide video YOUTUBE : https://www.youtube.com/watch?v=H16dZMYmvqo
 #
 # Author:      ylalo
-# Version      1.3
+# Version      1.4
 #
 # Created:     27-11-2024
 # Copyright:   (c) ylalo 2024
@@ -30,11 +30,13 @@ from PIL import Image
 #import pandas as pd
 import io
 import plotly.express as px
+import pymupdf
 import fitz  # PyMuPDF for PDF handling
-#from docx import Document  # python-docx for DOC/DOCX files
+
+from docx import Document  # python-docx for DOC/DOCX files
 import tempfile
 
-import builtins
+#import builtins
 #from urllib.parse import urlparse
 #import logging
 #from datetime import datetime
@@ -67,7 +69,7 @@ def process_image(content):
         os.unlink(tmp_path)
 
         return html.Div([
-            html.H3("Image Preview"),
+            html.H3("Image"),
             html.Img(src=f'data:image/png;base64,{img_str}')
         ])
     except Exception as e:
@@ -82,7 +84,8 @@ def process_pdf(content):
             tmp_path = tmp.name
 
         # Open PDF and convert first few pages to images
-        pdf_document = fitz.open(tmp_path)
+        #pdf_document = fitz.open(tmp_path)
+        pdf_document =pymupdf.open(tmp_path)
         pages_content = []
 
         for page_num in range(min(3, len(pdf_document))):  # Show first 3 pages
@@ -100,7 +103,7 @@ def process_pdf(content):
         os.unlink(tmp_path)
 
         return html.Div([
-            html.H3("PDF Preview"),
+            html.H3("Aperçu PDF"),
             html.Div(pages_content)
         ])
     except Exception as e:
@@ -126,7 +129,7 @@ def process_doc(content):
         os.unlink(tmp_path)
 
         return html.Div([
-            html.H3("Document Preview"),
+            html.H3("Aperçu Document"),
             html.Div(paragraphs)
         ])
     except Exception as e:
