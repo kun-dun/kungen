@@ -5,7 +5,7 @@
 #              Vide video YOUTUBE : https://www.youtube.com/watch?v=H16dZMYmvqo
 #
 # Author:      ylalo
-# Version      1.4
+# Version      1.5
 #
 # Created:     27-11-2024
 # Copyright:   (c) ylalo 2024
@@ -19,147 +19,13 @@ from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import os
-
-import json
+import git
+#import json
 import webbrowser
 import base64
 import platform
-#import ctypes
-import requests
-from PIL import Image
-#import pandas as pd
-import io
-import plotly.express as px
-import pymupdf
-import fitz  # PyMuPDF for PDF handling
+from github import Github
 
-from docx import Document  # python-docx for DOC/DOCX files
-import tempfile
-
-#import builtins
-#from urllib.parse import urlparse
-#import logging
-#from datetime import datetime
-#from logging.handlers import RotatingFileHandler
-#from pathlib import Path
-
-
-
-#from collections import deque
-#################### TRATAMENTO LEITURA ARQUIVOS DA WEB
-def process_image(content):
-    """Process and display image content"""
-    try:
-        # Create a temporary file to save the image
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp:
-            tmp.write(content)
-            tmp_path = tmp.name
-
-        # Open and resize image if necessary
-        img = Image.open(tmp_path)
-        max_size = (800, 800)
-        img.thumbnail(max_size, Image.Resampling.LANCZOS)
-
-        # Save processed image
-        img_buffer = io.BytesIO()
-        img.save(img_buffer, format='PNG')
-        img_str = base64.b64encode(img_buffer.getvalue()).decode()
-
-        # Clean up
-        os.unlink(tmp_path)
-
-        return html.Div([
-            html.H3("Image"),
-            html.Img(src=f'data:image/png;base64,{img_str}')
-        ])
-    except Exception as e:
-        return html.Div(f"Error processing image: {str(e)}")
-
-def process_pdf(content):
-    """Process and display PDF content"""
-    try:
-        # Create a temporary file to save the PDF
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp:
-            tmp.write(content)
-            tmp_path = tmp.name
-
-        # Open PDF and convert first few pages to images
-        #pdf_document = fitz.open(tmp_path)
-        pdf_document =pymupdf.open(tmp_path)
-        pages_content = []
-
-        for page_num in range(min(3, len(pdf_document))):  # Show first 3 pages
-            page = pdf_document[page_num]
-            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))  # Increase resolution
-            img_data = base64.b64encode(pix.tobytes()).decode()
-
-            pages_content.append(html.Div([
-                html.H4(f"Page {page_num + 1}"),
-                html.Img(src=f'data:image/png;base64,{img_data}')
-            ]))
-
-        # Clean up
-        pdf_document.close()
-        os.unlink(tmp_path)
-
-        return html.Div([
-            html.H3("Aperçu PDF"),
-            html.Div(pages_content)
-        ])
-    except Exception as e:
-        return html.Div(f"Error processing PDF: {str(e)}")
-
-def process_doc(content):
-    """Process and display DOC/DOCX content"""
-    try:
-        # Create a temporary file to save the document
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.docx') as tmp:
-            tmp.write(content)
-            tmp_path = tmp.name
-
-        # Read document
-        doc = Document(tmp_path)
-
-        # Extract and format content
-        paragraphs = []
-        for para in doc.paragraphs:
-            paragraphs.append(html.P(para.text))
-
-        # Clean up
-        os.unlink(tmp_path)
-
-        return html.Div([
-            html.H3("Aperçu Document"),
-            html.Div(paragraphs)
-        ])
-    except Exception as e:
-        return html.Div(f"Error processing document: {str(e)}")
-
-
-
-
-####################################################
-# Configuração do logging
-"""
-def setup_logger():
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-
-    logger = logging.getLogger('app_logger')
-    logger.setLevel(logging.INFO)
-
-    # Handler para arquivo
-    file_handler = logging.FileHandler('logs/app.log')
-    file_handler.setLevel(logging.INFO)
-
-    # Formato do log
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-
-    logger.addHandler(file_handler)
-    return logger
-"""
-#####################################################
 
 adir = os.getcwd()
 afile = adir + '\\js.txt'
@@ -13645,9 +13511,31 @@ aNodes = [{"data":{"id":"32","personneid":32,
 {"data":{"source":"87","target":"290"}}]
 
 
+############################################## GITHUB
 
-#with open(afile, "r") as meu_json:
-#    aNodes = json.load(meu_json)
+dirc = 'C://Users//Public//Downloads'
+os.chdir('C://Users//Public//Downloads')
+# GitHub repository details
+repo_url = 'https://github.com/kun-dun/kungen.git'
+local_repo_path = 'repo'
+#specific_directory = 'asset\\63'  # Remplacez par le chemin du répertoire spécifique
+target_directory = ''  #'C:\\Users\\Public\\Downloads\\'+ specific_directory
+
+# Clone the repository if it doesn't exist
+if not os.path.exists(local_repo_path):
+    repo = git.Repo.clone_from(repo_url, local_repo_path)
+else:
+    repo = git.Repo(local_repo_path)
+    repo.remotes.origin.pull()
+
+
+# Remplacez 'username' par le nom d'utilisateur GitHub et 'repo_name' par le nom du dépôt
+username ='kun-dun'
+repo_name = 'kungen'
+
+
+##############################################
+
 
 gen = Dash(__name__,external_stylesheets=[dbc.themes.BOOTSTRAP],
                 meta_tags=[{'name': 'viewport',
@@ -13718,7 +13606,7 @@ my_stylesheet = [
 def _from_rgb(rgb):
     return "#%02x%02x%02x" % rgb
 
-aphoto = 'photos/homme.jpg'
+aphoto = dirc+'//repo//photos//homme.jpg'
 
 def bimage(image_filename):
     with open(image_filename, 'rb') as f:
@@ -13759,15 +13647,23 @@ gen.layout = dbc.Container([
                          className='text-center text-primary'),md=4),
         html.Div(id='output-container'),
 
-        #dbc.Col(html.Button('Ouvrir', id='submit-func', n_clicks=0),md=1),
-        #html.Div(id='dd-output-container',className='fs-8'),
-         # Content display
+        # Content display
         html.Div(id='file-content'),
-        # Data visualization (for CSV files)
-        #dcc.Graph(id='data-visualization'),
-
         dcc.Store(id='current-node-data')
         ]),
+        # PDF Navigation Controls
+        html.Div([
+            html.Button('←', id='prev-page', className='nav-button'),
+            html.Span(id='page-info', style={'margin': '0 10px'}),
+            html.Button('→', id='next-page', className='nav-button'),
+            dcc.Input(
+                id='goto-page',
+                type='number',
+                min=1,
+                placeholder='Go to page...',
+                className='page-input'
+            ),
+        ], id='pdf-controls', style={'textAlign': 'center', 'margin': '10px', 'display': 'none'}),
 
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
@@ -13826,26 +13722,27 @@ def update_search(search_text, stylesheet):
 
 
 #######################  CALLBACK PHOTO
-@callback(
+@gen.callback(
     Output('current-node-data', 'data'),
     [Input('cytoscape-event-callbacks-1', 'tapNodeData')]
 )
 def update_stored_node_data(data):
     return data
-@callback(
+
+@gen.callback(
     Output('imagem-dinamica', 'src'),
     [Input('current-node-data', 'data')]
 )
 
 def update_image(data):
     if data is None:
-        return bimage('photos/homme.jpg')
+        return bimage(aphoto)
 
-    photo_path = f"photos/{data['personneid']}.jpg"
+    photo_path = dirc + '//repo//photos//'+str(data['personneid'])+'.jpg' #   f"photos/{data['personneid']}.jpg"
     #print(photo_path)
     if os.path.exists(photo_path):
         return bimage(photo_path)
-    return bimage('photos/homme.jpg')
+    return bimage(aphoto)
 
 #######################################
 @gen.callback(
@@ -13865,7 +13762,7 @@ def center_on_node(node_data):
 
 
 ######################## CALLBACK INFO PESSOA
-@callback(
+@gen.callback(
     Output('cytoscape-tapNodeData-json', 'children'),
     [Input('current-node-data', 'data')]
 )
@@ -13913,62 +13810,6 @@ def display_tap_node_data(data):
             "text-max-width": 40
         })
 
-
-def showfile(url):    #############Mostra arquivo do github do node cliquado
-    try:
-        # Fetch content from GitHub
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-
-        # Determine file type from URL
-        file_extension = url.split('.')[-1].lower()
-
-        # Process different file types
-        if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
-            return process_image(response.content), '', {}
-
-        elif file_extension == 'pdf':
-            return process_pdf(response.content), '', {}
-
-        elif file_extension in ['doc', 'docx']:
-            return process_doc(response.content), '', {}
-
-        elif file_extension == 'csv':
-            # Parse CSV data
-            content = response.text
-            df = pd.read_csv(io.StringIO(content))
-
-            # Create table display
-            table = html.Div([
-                html.H3("Data Preview"),
-                html.Table([
-                    html.Thead(html.Tr([html.Th(col) for col in df.columns])),
-                    html.Tbody([
-                        html.Tr([html.Td(df.iloc[i][col]) for col in df.columns])
-                        for i in range(min(5, len(df)))
-                    ])
-                ])
-            ])
-
-            # Create visualization if numerical columns exist
-            numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
-            if len(numeric_cols) >= 2:
-                fig = px.scatter(df, x=numeric_cols[0], y=numeric_cols[1],
-                               title=f"Scatter Plot: {numeric_cols[0]} vs {numeric_cols[1]}")
-            else:
-                fig = {}
-
-            return table, '', fig
-
-        elif file_extension in ['txt', 'md', 'py', 'json']:
-            return html.Pre(response.text), '', {}
-
-        else:
-            return html.Div("Format de Fichier non reconnu!"), '', {}
-
-    except Exception as e:
-        return '', f"Error: {str(e)}", {}
-
 ######################## CALLBACK DROPDOWN
 @callback(
     Output('my-dpdn', 'options'),
@@ -13979,13 +13820,11 @@ def update_dropdown(data):
     if data is None:
         return [], None
 
-    person_dir = "asset/"+str(data['personneid'])+'/'
-
-    os.path.join(adir, person_dir)
+    person_dir = dirc+"//repo//asset/"+str(data['personneid'])
 
     if not os.path.exists(person_dir):
        return [], None
-    files = os.listdir(adir+'/'+person_dir)
+    files = os.listdir(person_dir)
 
     options = [{'label': f, 'value': os.path.join(person_dir, f)} for f in files]
 
@@ -13998,14 +13837,18 @@ def update_dropdown(data):
 )
 def update_output(value):
     if not value == None:
-        end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/'
-        aurl=end+str(value)
-        return showfile(aurl)
-
-
+        #end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/'
+        #aurl=end+str(value)
+        #print(value)
+        system = platform.system()
+        if system == "Windows":
+            os.startfile(value)
+        elif system == "Darwin":
+            subprocess.run(['open', value])
+        else:
+            subprocess.run(['xdg-open', value])
+        return ''
 
 if __name__ == '__main__':
-    #ctypes.windll.user32.MessageBoxW(0,"Continuer ?", "Your title", 1)
-
     webbrowser.open_new(url='http://127.0.0.1:8050')
     gen.run(debug=False)
