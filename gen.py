@@ -19,10 +19,12 @@ import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import os
 import git
+from git import Repo
 import webbrowser
 import base64
 import platform
 from github import Github
+import shutil
 
 
 adir = os.getcwd()
@@ -13509,7 +13511,9 @@ aNodes = [{"data":{"id":"32","personneid":32,
 {"data":{"source":"87","target":"290"}}]
 
 
-############################################## GITHUB
+
+
+###############################################GITHUB
 
 dirc = 'C://Users//Public//Downloads'
 os.chdir('C://Users//Public//Downloads')
@@ -13518,13 +13522,40 @@ repo_url = 'https://github.com/kun-dun/kungen.git'
 local_repo_path = 'repo'
 #specific_directory = 'asset\\63'  # Remplacez par le chemin du répertoire spécifique
 target_directory = ''  #'C:\\Users\\Public\\Downloads\\'+ specific_directory
-
+repodir=dirc+'//'+local_repo_path
 # Clone the repository if it doesn't exist
+
+#if os.path.exists(local_repo_path):
+    # Utilisez shutil.rmtree pour supprimer le répertoire et tout son contenu
+#    shutil.rmtree(local_repo_path, ignore_errors=True)
+
+
+def updaterepo(chemin_repo):
+    # Vérifier si le répertoire existe
+    if not os.path.exists(chemin_repo):
+        print(f"Le répertoire {chemin_repo} n'existe pas.")
+        return
+
+    # Ouvrir le dépôt Git
+    repo = Repo(chemin_repo)
+
+    # Vérifier l'état du dépôt
+    print("État actuel du dépôt :")
+    print(repo.git.status())
+
+    # Récupérer les dernières modifications
+    origin = repo.remotes.origin
+    print(f"Mise à jour depuis {origin.url}...")
+    origin.pull()
+
+    print("Mise à jour terminée.")
+
 if not os.path.exists(local_repo_path):
     repo = git.Repo.clone_from(repo_url, local_repo_path)
 else:
-    repo = git.Repo(local_repo_path)
-    repo.remotes.origin.pull()
+    updaterepo(local_repo_path)
+repo = git.Repo(local_repo_path)
+repo.remotes.origin.pull()
 
 
 # Remplacez 'username' par le nom d'utilisateur GitHub et 'repo_name' par le nom du dépôt
@@ -13741,7 +13772,7 @@ def display_tap_node_data(data):
 
 
     details = [
-        f"{data['nom']},{data['prenoms']}",
+        f"{data['nom']},{data['prenoms']},{data['personneid']}",
         f"Né le : {data['naissance']}",
         f"à {data['villenaiss']} {data['paysnaiss']}"
     ]
