@@ -13,14 +13,12 @@
 #-------------------------------------------------------------------------------
 import subprocess
 import dash
-#import dash_core_components as dcc
 from dash import Dash, html, Input, Output, callback, dash_table,dcc
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import os
 import git
-#import json
 import webbrowser
 import base64
 import platform
@@ -13615,64 +13613,36 @@ def bimage(image_filename):
 
 gen.layout = dbc.Container([
     dbc.Row([
-        dbc.Col([
-           html.Img(id='imagem-dinamica', src=bimage(aphoto), style={
+        dbc.Col([ html.Img(id='imagem-dinamica', src=bimage(aphoto), style={
             'position': 'absolute',
             'top': '30px',
-            'left': '10px'})
-        ])
-    ]),
-    dbc.Row([
-        dbc.Col(html.H1("GÉNÉALOGIE",
-                        className='text-center fs-1'),width=12)
-    ]),
+            'left': '10px'})])
+           ]),
+    dbc.Row([dbc.Col(html.H1("GÉNÉALOGIE",className='text-center fs-1'),width=12)]),
 
-    dbc.Row([
-        dbc.Col(html.H1("(Zoom :Rouler la souris)",
-                        className='text-center fs-6'),  # fs-6 = font size : maior o numero, menor a font
-                width=12)
-    ]),
-    dbc.Row(
-        dbc.Col(html.H1("Cliquer sur la Personne pour voir les Détails",
-                        className='text-center fs-6'),width=12)
-    ),
-    dbc.Row([html.H1()]),
+    dbc.Row([dbc.Col(html.H1("(Zoom :Rouler la souris)",className='text-center fs-6'),width=12)]),   # fs-6 = font size : maior o numero, menor a font
+    dbc.Row(dbc.Col(html.H1("Cliquer sur la Personne pour voir les Détails",className='text-center fs-6'),width=12) ),
+    dbc.Row([html.H1()]),  #linhas em branco
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
 
     dbc.Row([
-
-        dbc.Col(dcc.Dropdown(id='my-dpdn', multi=False, placeholder='Choisir un Document',
-                         className='text-center text-primary'),md=4),
-        html.Div(id='output-container'),
+        dbc.Col(dcc.Dropdown(id='my-dpdn', multi=False, placeholder='Choisir un Document',className='text-center text-primary'),md=4),
+        dbc.Col(md=1),   #coluna em branco para dar espacejamento
+        dbc.Col( html.Div(dcc.Input(id='input-on-rech', type='text', placeholder='Rechercher um Nom',className='text-center ')),md=4),
+                 html.H1("(Personnes Trouvées en Jaune)",className='text-center fs-6'),
+                 html.Div(id='output-container'),
 
         # Content display
         html.Div(id='file-content'),
         dcc.Store(id='current-node-data')
-        ]),
-        # PDF Navigation Controls
-        html.Div([
-            html.Button('←', id='prev-page', className='nav-button'),
-            html.Span(id='page-info', style={'margin': '0 10px'}),
-            html.Button('→', id='next-page', className='nav-button'),
-            dcc.Input(
-                id='goto-page',
-                type='number',
-                min=1,
-                placeholder='Go to page...',
-                className='page-input'
-            ),
-        ], id='pdf-controls', style={'textAlign': 'center', 'margin': '10px', 'display': 'none'}),
+            ]),
 
+    dbc.Row([html.H1()]),   #Linha em branco.......
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
     dbc.Row([html.H1()]),
-    dbc.Row([html.H1()]),
-    dbc.Row([
-        #dbc.Col([ html.Label('Rechercher un Nom', id='lab-rech', n_clicks=0)]),
-        dbc.Col([ html.Div(dcc.Input(id='input-on-rech', type='text', placeholder='Rechercher um Nom',className='text-center '))
-        ]),
 
 
     dbc.Row([
@@ -13691,11 +13661,10 @@ gen.layout = dbc.Container([
         stylesheet=my_stylesheet,
         elements=aNodes),# Componente para exibir os dados do nó clicado
         html.Div(id='cytoscape-tapNodeData-json')],width=12),
-        dbc.Col([html.Div(id='container-button-func', children='resultat')]
-        ),
-    ])
-    ])
-],fluid= True)
+        dbc.Col([html.Div(id='container-button-func', children='resultat')])
+            ])  ###fim cytoscape
+
+],fluid= True)  #fim container
 
 
 
@@ -13837,16 +13806,8 @@ def update_dropdown(data):
 )
 def update_output(value):
     if not value == None:
-        #end = 'https://raw.githubusercontent.com/kun-dun/kungen/main/'
-        #aurl=end+str(value)
-        #print(value)
-        system = platform.system()
-        if system == "Windows":
-            os.startfile(value)
-        elif system == "Darwin":
-            subprocess.run(['open', value])
-        else:
-            subprocess.run(['xdg-open', value])
+        #webbrowser.open(value,new=1,autoraise=True)
+        webbrowser.open_new(value)
         return ''
 
 if __name__ == '__main__':
